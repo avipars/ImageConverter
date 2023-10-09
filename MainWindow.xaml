@@ -1,0 +1,31 @@
+﻿<Window x:Class="ImageConverter.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Image Converter" Height="350" Width="525">
+    <Grid>
+        <StackPanel Margin="10">
+            <!--<Button Content="Select Image" Click="SelectImageButton" Margin="0,0,0,10"/>-->
+            <ComboBox x:Name="FormatComboBox" SelectedIndex="0">
+                <ComboBoxItem Content="JPEG"/>
+                <ComboBoxItem Content="PNG"/>
+                <ComboBoxItem Content="GIF"/>
+                <!-- Add other format options here -->
+            </ComboBox>
+            <Button Content="Convert" Click="ConvertButton_Click"/>
+
+
+            <Separator/>
+
+            <Label Content="Path: " x:Name="PathLabel" MouseDoubleClick="CopyToClipboardButton2_Click"/>
+            
+            <Label Content="Hash: " x:Name="HashLabel" MouseDoubleClick="CopyToClipboardButton_Click"/>
+
+            <Button Content="Get Hash" Click="HashButton_Click" x:Name="HashButton" Margin="0,0,0,10"/>
+
+        </StackPanel>
+
+
+    </Grid>
+
+
+</Window>
