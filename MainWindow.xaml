@@ -19,9 +19,11 @@
             <Label Content="Path: " x:Name="PathLabel" MouseDoubleClick="CopyToClipboardButton2_Click"/>
             
             <Label Content="Hash: " x:Name="HashLabel" MouseDoubleClick="CopyToClipboardButton_Click"/>
-
+        
             <Button Content="Get Hash" Click="HashButton_Click" x:Name="HashButton" Margin="0,0,0,10"/>
 
+
+            <TextBox Text="Status:" x:Name="Status" IsReadOnly="True" />
         </StackPanel>
 
 
