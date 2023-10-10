@@ -9,18 +9,26 @@
                 <ComboBoxItem Content="JPEG"/>
                 <ComboBoxItem Content="PNG"/>
                 <ComboBoxItem Content="GIF"/>
+                <ComboBoxItem Content="TIFF"/>
+                <ComboBoxItem Content="BMP"/>
+                <ComboBoxItem Content="HEIF"/>
+
+                <!--<ComboBoxItem Content="ICO"/>-->
+
                 <!-- Add other format options here -->
             </ComboBox>
             <Button Content="Convert" Click="ConvertButton_Click"/>
 
 
+
+            <Image x:Name="IMPreview" MaxHeight="100" MaxWidth="100" Height="70" Width="70" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Fill" />
+            <Label Content="Path: " x:Name="PathLabel" MouseDoubleClick="CopyToClipboardPath_Click"/>
+            
+            <Label Content="Hash: " x:Name="HashLabel" MouseDoubleClick="CopyToClipboardHash_Click"/>
+        
             <Separator/>
 
-            <Label Content="Path: " x:Name="PathLabel" MouseDoubleClick="CopyToClipboardButton2_Click"/>
-            
-            <Label Content="Hash: " x:Name="HashLabel" MouseDoubleClick="CopyToClipboardButton_Click"/>
-        
-            <Button Content="Get Hash" Click="HashButton_Click" x:Name="HashButton" Margin="0,0,0,10"/>
+            <Button Content="Get File Info" Click="HashButton_Click" x:Name="HashButton" Margin="0,0,0,10"/>
 
 
             <TextBox Text="Status:" x:Name="Status" IsReadOnly="True" />

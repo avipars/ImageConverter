@@ -20,60 +20,42 @@ namespace ImageConverter
         {
             InitializeComponent();
 
+            //init labels
             System.Windows.Controls.Label HashLabel = new System.Windows.Controls.Label();
             System.Windows.Controls.Label PathLabel = new System.Windows.Controls.Label();
             TextBox Status = new TextBox();
+            Image IMPreview = new Image();
         }
-
-        //Image Image { get; set; }
 
         string hash = "";
         string path = "";
 
-        //private void SelectImageButton(object sender, RoutedEventArgs e)
-        //{
-        //    OpenFileDialog openFileDialog = new OpenFileDialog();
-        //    openFileDialog.Title = "Select image";
-        //    if (openFileDialog.ShowDialog() == true)
-        //    {
-        //        // Code to load the selected image
-        //        // Display the image or save the path for later use
-        //        try
-        //        {
-        //            // Load the selected image
-        //            BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
-
-        //            // Display the image or save the path for later use
-        //            //Image.Source = bitmapImage; // Replace "YourImageControl" with the actual name of your image control in the XAML
-
-        //            // Alternatively, you can save the path for later use
-        //            path = openFileDialog.FileName;
-        //            CalculateFileHash(path);
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            Status.AppendText($"An error occurred: {ex.Message}");
-        //            //MessageBox.Show($"An error occurred: {ex.Message}", "Image Converter", MessageBoxButton.OK, MessageBoxImage.Error);
-        //        }
-        //    }
-        //}
-
+ 
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Title = "Select an image";
-        
+
+            //only allow images, add WEBP, tiff, ico
+            openFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|PNG Image (*.png)|*.png|GIF Image (*.gif)|*.gif|HEIF Image (*.heif)|*.heif|WebP Image (*.webp)|*.webp|TIFF Image (*.tiff)|*.tiff|Icon Image (*.ico)|*.ico|HEIC Image (*.heic)|*.heic|All Files|*.*";
+            //openFileDialog.Filter = "Image Files (*.bmp, *.jpg, *.png, *.gif, *.heif, *.webp, *.tiff, *.ico, *.heic)|*.bmp;*.jpg;*.png;*.gif;*.heif;*.webp;*.tiff;*.ico;*.heic;";
+            openFileDialog.Multiselect = false;
+            openFileDialog.CheckFileExists = true;
+            openFileDialog.CheckPathExists = true;
+
             if (openFileDialog.ShowDialog() == true)
             {
                 try
                 {
                     // Load the selected image
                     BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
-
+                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad; //load image into memory
+                    bitmapImage.Freeze(); //prevent memory leaks
                     ComboBoxItem selectedItem = (ComboBoxItem)FormatComboBox.SelectedItem;
 
                     string format;
-                    if (selectedItem == null || selectedItem.Content == null ||  string.IsNullOrEmpty(selectedItem.Content.ToString())) {
+                    if (selectedItem == null || selectedItem.Content == null || string.IsNullOrEmpty(selectedItem.Content.ToString()))
+                    {
                         format = "";
                         Status.AppendText("Need to select an option " + format);
                         throw new Exception("Need to select an option");
@@ -87,13 +69,12 @@ namespace ImageConverter
                     path = openFileDialog.FileName;
                     CalculateFileHash(path);
 
-          
                     // Get the file extension based on the selected format
                     ImageFormat imageFormat = null;
 
                     switch (format)
                     {
-                     
+
                         case "jpeg":
                             imageFormat = ImageFormat.Jpeg;
                             break;
@@ -103,19 +84,24 @@ namespace ImageConverter
                         case "gif":
                             imageFormat = ImageFormat.Gif;
                             break;
-                        
-                        case "webp": 
+                        case "tiff":
+                            imageFormat = ImageFormat.Tiff;
+                            break;
+                        case "bmp":
+                            imageFormat = ImageFormat.Bmp;
+                            break;
+                        case "ico":
+                            imageFormat = ImageFormat.Icon;
+                            break;
+                        case "webp":
                             if ((!OperatingSystem.IsWindows() || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 18362)))
                             {
                                 Console.WriteLine("WebP not supported on windows 7");
                                 Status.AppendText("WebP not supported on " + System.Runtime.InteropServices.RuntimeInformation.OSDescription);
                                 return;
                             }
-                          
                             imageFormat = ImageFormat.Webp;
                             break;
-                            
-                        // Add other format cases here
                         case "heif":
                             if ((!OperatingSystem.IsWindows() || !OperatingSystem.IsWindowsVersionAtLeast(10, 0, 18362)))
                             {
@@ -126,12 +112,16 @@ namespace ImageConverter
                             imageFormat = ImageFormat.Heif;
                             break;
                     }
-                    //close OG image
+
+                    IMPreview.Source = bitmapImage; //show preview
+                   
 
                     // Save the converted image
                     SaveFileDialog saveFileDialog = new SaveFileDialog();
                     saveFileDialog.Title = "Chose where to save the new file";
                     saveFileDialog.Filter = $"{format.ToUpper()} Image|*.{format}";
+                    saveFileDialog.ValidateNames = true;
+                    saveFileDialog.AddExtension = true;
                     if (saveFileDialog.ShowDialog() == true)
                     {
                         using (FileStream fileStream = new FileStream(saveFileDialog.FileName, FileMode.Create))
@@ -148,28 +138,31 @@ namespace ImageConverter
                                 case "gif":
                                     encoder = new GifBitmapEncoder();
                                     break;
-                                    // Add other format cases here
+                                case "tiff":
+                                    encoder = new TiffBitmapEncoder();
+                                    break;
+                                case "bmp":
+                                    encoder = new BmpBitmapEncoder();
+                                    break;
                             }
 
-                            if(encoder == null)
+                            if (encoder == null)
                             {
                                 //log an error
-                                Console.WriteLine("Encoder is null");
-                                Status.AppendText("\nEncoder is null");
+                                Console.WriteLine("Encoder is null (format not found)");
+                                Status.AppendText("\nEncoder is null (format not found)");
                                 return;
                             }
                             encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
                             encoder.Save(fileStream);
                             fileStream.Close();
-
-                            //MessageBox.Show("Image converted and saved successfully!", "Image Converter");
+                                
                             Status.AppendText("\nImage converted and saved successfully!");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    //MessageBox.Show($"An error occurred: {ex.Message}", "Image Converter", MessageBoxButton.OK, MessageBoxImage.Error);
                     Status.Text = $"An error occurred: {ex.Message}";
                 }
             }
@@ -177,10 +170,15 @@ namespace ImageConverter
 
         private void HashButton_Click(object sender, RoutedEventArgs e)
         {
-          
+
 
             Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
             openFileDialog.Filter = "All Files (*.*)|*.*";
+            openFileDialog.AddExtension = true;
+            openFileDialog.CheckFileExists = true;
+            openFileDialog.CheckPathExists = true;
+            openFileDialog.Multiselect = false;
+            openFileDialog.Title = "Select a file";
             HashLabel.Content = "";
             PathLabel.Content = "";
 
@@ -188,14 +186,15 @@ namespace ImageConverter
             {
                 path = openFileDialog.FileName;
                 CalculateFileHash(path);
-
+                //get file properties too
+                FileInfo fi = new FileInfo(path);
+                Status.AppendText($"\nFile size: {fi.Length} bytes, attributes: {fi.Attributes}, {fi.CreationTime}");
             }
             else
             {
                 HashLabel.Content = "";
                 PathLabel.Content = "";
                 Status.Text = "No file selected";
-
             }
         }
 
@@ -211,7 +210,6 @@ namespace ImageConverter
                         hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
                         HashLabel.Content = "Hash: " + hash;
                         PathLabel.Content = "Path: " + filePath;
-
                     }
                     stream.Close();
                 }
@@ -220,45 +218,32 @@ namespace ImageConverter
             catch (Exception ex)
             {
                 HashLabel.Content = "Error calculating hash: ";
-                PathLabel.Content = "ERROR";
                 Status.AppendText("\nError calculating hash: " + ex.Message);
-
-                //MessageBox.Show("Error calculating hash: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
 
-        private void CopyToClipboardButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (!string.IsNullOrEmpty(hash as string))
-            {
-                //remove the prefix
-                Clipboard.SetText(hash);
-                //MessageBox.Show("Hash copied to clipboard.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                //MessageBox.Show("No hash to copy.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                Status.AppendText("\nNo hash to copy.");
 
-            }
+        private void CopyToClipboardHash_Click(object sender, RoutedEventArgs e)
+        {
+            CopyClip(hash, "hash");
         }
 
-        private void CopyToClipboardButton2_Click(object sender, RoutedEventArgs e)
+        private void CopyToClipboardPath_Click(object sender, RoutedEventArgs e)
         {
-            if (!string.IsNullOrEmpty(path as string))
+            CopyClip(path,"path");
+        }
+
+        private void CopyClip(string item, string type)
+        {
+            if (!string.IsNullOrEmpty(item as string))
             {
-                Clipboard.SetText(path);
-                //MessageBox.Show("Hash copied to clipboard.", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                Clipboard.SetText(item);
             }
             else
             {
-                //MessageBox.Show("No Path to copy.", "Information", MessageBoxButton.OK, MessageBoxImage.Information);
-                Status.AppendText("\nNo path to copy.");
-
+                Status.AppendText($"\nNo {type} to copy.");
             }
         }
     }
-
 }
-
