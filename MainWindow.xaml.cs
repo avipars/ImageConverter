@@ -9,7 +9,7 @@ using Microsoft.Win32;
 using System.Security.Cryptography;
 using System.Reflection.Emit;
 using System.Collections;
-
+using System.Runtime.Intrinsics.Arm;
 
 namespace ImageConverter
 {
@@ -144,6 +144,9 @@ namespace ImageConverter
                                 case "bmp":
                                     encoder = new BmpBitmapEncoder();
                                     break;
+                                case "ico":
+                                    encoder = new IconBitmapEncoder();
+                                    break;
                             }
 
                             if (encoder == null)
@@ -198,6 +201,55 @@ namespace ImageConverter
             }
         }
 
+        private ushort CalculateChecksum16(string filePath)
+        {
+            ushort checksum = 0;
+
+            try
+            {
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] buffer = new byte[1024]; // Adjust buffer size as needed
+                    int bytesRead;
+
+                    while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        for (int i = 0; i < bytesRead; i++)
+                        {
+                            checksum = (ushort)((checksum + buffer[i]) & 0xFFFF);
+                        }
+                    }
+                }
+
+                return checksum;
+            }
+            catch (Exception ex)
+            {
+                // Handle the exception as needed
+                Console.WriteLine("Error calculating checksum: " + ex.Message);
+                throw; // Re-throw the exception if needed
+            }
+        }
+
+        private void CalculateFileChecksum(string filePath)
+        {
+            try
+            {
+                ushort checksum = CalculateChecksum16(filePath);
+                string checksumHex = checksum.ToString("X");
+
+                Status.AppendText("\nChecksum(16 - bit): " + checksum.ToString() + "\n" + checksumHex);
+                //convert to HEX
+
+
+            }
+            catch (Exception ex)
+            {
+                HashLabel.Content = "Error calculating checksum: ";
+                Status.AppendText("\nError calculating checksum: " + ex.Message);
+            }
+        }
+
         private void CalculateFileHash(string filePath)
         {
             try
@@ -208,9 +260,12 @@ namespace ImageConverter
                     {
                         byte[] hashBytes = sha.ComputeHash(stream);
                         hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+
+
                         HashLabel.Content = "Hash: " + hash;
                         PathLabel.Content = "Path: " + filePath;
                     }
+
                     stream.Close();
                 }
 
@@ -220,6 +275,8 @@ namespace ImageConverter
                 HashLabel.Content = "Error calculating hash: ";
                 Status.AppendText("\nError calculating hash: " + ex.Message);
             }
+
+            CalculateFileChecksum(filePath);
         }
 
 
