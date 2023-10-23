@@ -3,11 +3,20 @@
 
 ![image](https://github.com/avipars/ImageConverter/assets/5733247/aa942aac-0236-401a-8e69-37eff07625e0)
 
+
+Download/Run:
+
+* Go to [Releases](https://github.com/avipars/ImageConverter/releases) and click on "ImageConverter.zip" in the latest release, then extract the file and now click on "ImageConverter.exe" to run
+  
+* Can be used as a portable exe but you need to have the "Magick.NET.Core.dll"  in the same folder as exe 
+
+
+Alternateively, you can compile it yourselv via Visual Studio 2022
+
+  
 Application:
 
-* Can be used as a portable exe but you need to have the Masgisk.NET.Core DLL (13.4.0) in the same folder as exe 
-
-* Uses WPF, .Net 7.0, Masgisk (for image conversions)
+* Uses WPF, .Net 7.0, Masgisk (for image conversions) Version 13.4.0 - at time of publishing
 
 Convert:
 
@@ -30,3 +39,7 @@ Get File Info:
 * Also returns some basic information including file size in bytes and path 
 
 * Even works for files in the recycle bin
+
+
+
+
