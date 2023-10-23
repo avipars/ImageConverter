@@ -1,7 +1,7 @@
 # ImageConverter
 
 
-![image](https://github.com/avipars/ImageConverter/assets/5733247/53e1d480-7b3f-40bf-873d-4e8d6f58b5b7)
+![image](https://github.com/avipars/ImageConverter/assets/5733247/aa942aac-0236-401a-8e69-37eff07625e0)
 
 Application:
 
@@ -28,3 +28,5 @@ Get File Info:
 * Hash uses SHA256
 
 * Also returns some basic information including file size in bytes and path 
+
+* Even works for files in the recycle bin
