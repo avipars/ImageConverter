@@ -37,7 +37,7 @@ namespace ImageConverter
             openFileDialog.Title = "Select an image";
 
             //only allow images, add WEBP, tiff, ico
-            openFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|PNG Image (*.png)|*.png|GIF Image (*.gif)|*.gif|HEIF Image (*.heif)|*.heif|WebP Image (*.webp)|*.webp|TIFF Image (*.tiff)|*.tiff|Icon Image (*.ico)|*.ico|HEIC Image (*.heic)|*.heic|All Files|*.*";
+            openFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|PNG Image (*.png)|*.png|GIF Image (*.gif)|*.gif|HEIF/C Image (*.heif, *.heic)|*.heif|WebP Image (*.webp)|*.webp|TIFF Image (*.tiff)|*.tiff|Icon Image (*.ico)|*.ico|All Files|*.*";
             //openFileDialog.Filter = "Image Files (*.bmp, *.jpg, *.png, *.gif, *.heif, *.webp, *.tiff, *.ico, *.heic)|*.bmp;*.jpg;*.png;*.gif;*.heif;*.webp;*.tiff;*.ico;*.heic;";
             openFileDialog.Multiselect = false;
             openFileDialog.CheckFileExists = true;
@@ -121,6 +121,8 @@ namespace ImageConverter
                     saveFileDialog.Title = "Chose where to save the new file";
                     saveFileDialog.Filter = $"{format.ToUpper()} Image|*.{format}";
                     saveFileDialog.ValidateNames = true;
+                    saveFileDialog.CheckFileExists = false;
+                    saveFileDialog.CheckPathExists = true;
                     saveFileDialog.AddExtension = true;
                     if (saveFileDialog.ShowDialog() == true)
                     {
@@ -144,9 +146,9 @@ namespace ImageConverter
                                 case "bmp":
                                     encoder = new BmpBitmapEncoder();
                                     break;
-                                case "ico":
-                                    encoder = new IconBitmapEncoder();
-                                    break;
+                                //case "ico":
+                                //    encoder = new IconBitmapEncoder();
+                                //    break;
                             }
 
                             if (encoder == null)
@@ -182,8 +184,8 @@ namespace ImageConverter
             openFileDialog.CheckPathExists = true;
             openFileDialog.Multiselect = false;
             openFileDialog.Title = "Select a file";
-            HashLabel.Content = "";
-            PathLabel.Content = "";
+            Status.Text = "";
+      
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -195,8 +197,6 @@ namespace ImageConverter
             }
             else
             {
-                HashLabel.Content = "";
-                PathLabel.Content = "";
                 Status.Text = "No file selected";
             }
         }
@@ -238,14 +238,13 @@ namespace ImageConverter
                 ushort checksum = CalculateChecksum16(filePath);
                 string checksumHex = checksum.ToString("X");
 
-                Status.AppendText("\nChecksum(16 - bit): " + checksum.ToString() + "\n" + checksumHex);
+                Status.AppendText("\nChecksum (CRC 16 Hex): " + checksumHex);
                 //convert to HEX
 
 
             }
             catch (Exception ex)
             {
-                HashLabel.Content = "Error calculating checksum: ";
                 Status.AppendText("\nError calculating checksum: " + ex.Message);
             }
         }
@@ -261,9 +260,10 @@ namespace ImageConverter
                         byte[] hashBytes = sha.ComputeHash(stream);
                         hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
 
+                        Status.AppendText("\nPath: " + filePath);
+                        Status.AppendText("\nSHA 256 Hash: " + hash);
 
-                        HashLabel.Content = "Hash: " + hash;
-                        PathLabel.Content = "Path: " + filePath;
+
                     }
 
                     stream.Close();
@@ -272,7 +272,6 @@ namespace ImageConverter
             }
             catch (Exception ex)
             {
-                HashLabel.Content = "Error calculating hash: ";
                 Status.AppendText("\nError calculating hash: " + ex.Message);
             }
 

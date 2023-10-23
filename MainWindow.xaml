@@ -22,9 +22,9 @@
 
 
             <Image x:Name="IMPreview" MaxHeight="100" MaxWidth="100" Height="70" Width="70" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Fill" />
-            <Label Content="Path: " x:Name="PathLabel" MouseDoubleClick="CopyToClipboardPath_Click"/>
+            <!--<Label Content="Path: " x:Name="PathLabel" MouseDoubleClick="CopyToClipboardPath_Click"/>
             
-            <Label Content="Hash: " x:Name="HashLabel" MouseDoubleClick="CopyToClipboardHash_Click"/>
+            <Label Content="Hash: " x:Name="HashLabel" MouseDoubleClick="CopyToClipboardHash_Click"/>-->
         
             <Separator/>
 
