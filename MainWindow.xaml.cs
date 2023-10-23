@@ -10,36 +10,30 @@ using System.Security.Cryptography;
 using System.Reflection.Emit;
 using System.Collections;
 using System.Runtime.Intrinsics.Arm;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ImageConverter
 {
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
 
-            //init labels
-            System.Windows.Controls.Label HashLabel = new System.Windows.Controls.Label();
-            System.Windows.Controls.Label PathLabel = new System.Windows.Controls.Label();
+            //bind to components
             TextBox Status = new TextBox();
-            Image IMPreview = new Image();
+            Image IMPreview = new Image(); //new image
         }
 
-        string hash = "";
-        string path = "";
-
- 
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Title = "Select an image";
+            openFileDialog.Title = "Select a source image";
 
             //only allow images, add WEBP, tiff, ico
-            openFileDialog.Filter = "Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|PNG Image (*.png)|*.png|GIF Image (*.gif)|*.gif|HEIF/C Image (*.heif, *.heic)|*.heif|WebP Image (*.webp)|*.webp|TIFF Image (*.tiff)|*.tiff|Icon Image (*.ico)|*.ico|All Files|*.*";
-            //openFileDialog.Filter = "Image Files (*.bmp, *.jpg, *.png, *.gif, *.heif, *.webp, *.tiff, *.ico, *.heic)|*.bmp;*.jpg;*.png;*.gif;*.heif;*.webp;*.tiff;*.ico;*.heic;";
-            openFileDialog.Multiselect = false;
+            openFileDialog.Filter = "All Files|*.*|Bitmap Image (*.bmp)|*.bmp|JPEG Image (*.jpg, *.jpeg)|*.jpg;*.jpeg|PNG Image (*.png)|*.png|GIF Image (*.gif)|*.gif|HEIF/C Image (*.heif, *.heic)|*.heif|WebP Image (*.webp)|*.webp|TIFF Image (*.tiff)|*.tiff|Icon Image (*.ico)|*.ico";
+            openFileDialog.Multiselect = false; //only 1 image at a time
             openFileDialog.CheckFileExists = true;
             openFileDialog.CheckPathExists = true;
 
@@ -51,30 +45,33 @@ namespace ImageConverter
                     BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
                     bitmapImage.CacheOption = BitmapCacheOption.OnLoad; //load image into memory
                     bitmapImage.Freeze(); //prevent memory leaks
+
+                    IMPreview.Source = bitmapImage; //show preview
+
+
                     ComboBoxItem selectedItem = (ComboBoxItem)FormatComboBox.SelectedItem;
 
                     string format;
                     if (selectedItem == null || selectedItem.Content == null || string.IsNullOrEmpty(selectedItem.Content.ToString()))
                     {
                         format = "";
-                        Status.AppendText("Need to select an option " + format);
+                        Status.AppendText("Need to select an option");
                         throw new Exception("Need to select an option");
-
                     }
                     else
                     {
-                        format = selectedItem.Content.ToString().ToLower();
+                        format = selectedItem.Content.ToString().ToLower(); //get format from the spinner box (user shouln't be able to select anything else)
                     }
 
-                    path = openFileDialog.FileName;
-                    CalculateFileHash(path);
+                    string path = openFileDialog.FileName;
+                    CalculateFileHash(path, "Original image");
+                    Status.AppendText("\n" + getFileInfo(path));
 
                     // Get the file extension based on the selected format
                     ImageFormat imageFormat = null;
 
                     switch (format)
                     {
-
                         case "jpeg":
                             imageFormat = ImageFormat.Jpeg;
                             break;
@@ -111,10 +108,16 @@ namespace ImageConverter
                             }
                             imageFormat = ImageFormat.Heif;
                             break;
+                        default:
+                            imageFormat = null;
+                            Status.AppendText("\nFormat not supported, proceed at your own risk");
+                            break;
                     }
 
-                    IMPreview.Source = bitmapImage; //show preview
-                   
+                    if (imageFormat == null)
+                    { //major problem if we got here
+                        throw new ArgumentNullException("imageFormat", "imageFormat is null");
+                    }
 
                     // Save the converted image
                     SaveFileDialog saveFileDialog = new SaveFileDialog();
@@ -146,54 +149,86 @@ namespace ImageConverter
                                 case "bmp":
                                     encoder = new BmpBitmapEncoder();
                                     break;
-                                //case "ico":
-                                //    encoder = new IconBitmapEncoder();
-                                //    break;
+                                default:
+                                    encoder = null;
+                                    Status.AppendText("\nFormat not supported");
+                                    break;
                             }
 
                             if (encoder == null)
                             {
-                                //log an error
                                 Console.WriteLine("Encoder is null (format not found)");
-                                Status.AppendText("\nEncoder is null (format not found)");
+                                Status.AppendText("\nEncoder is null (format not found)");      //log an error
                                 return;
                             }
+
+
                             encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
                             encoder.Save(fileStream);
-                            fileStream.Close();
-                                
+                            fileStream.Close(); //done with file
+
                             Status.AppendText("\nImage converted and saved successfully!");
+
+                            CalculateFileHash(saveFileDialog.FileName, "Converted image");
+                            Status.AppendText("\n" + getFileInfo(path));
+
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     Status.Text = $"An error occurred: {ex.Message}";
+                    Console.WriteLine("An error occurred: " + ex.Message);
                 }
             }
         }
 
+        /// <summary>
+        /// elper function to convert bytes to a more readable format
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
+        private string bytesToRightFormat(long bytes)
+        {
+            string[] suffix = { "B", "KB", "MB", "GB", "TB" };
+            int i;
+            double dblSByte = bytes;
+            for (i = 0; i < suffix.Length && bytes >= 1024; i++, bytes /= 1024)
+            {
+                dblSByte = bytes / 1024.0;
+            }
+
+            return String.Format("{0:0.##} {1}", dblSByte, suffix[i]);
+        }
+
+        /// <summary>
+        ///  Helper function to get file info
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private string getFileInfo(string path)
+        {
+            FileInfo fi = new FileInfo(path);
+            string sizeOf = bytesToRightFormat(fi.Length);
+            return $"File size: {sizeOf} , attributes: {fi.Attributes}, Created {fi.CreationTime} Last Accessed {fi.LastAccessTime}";
+        }
+
         private void HashButton_Click(object sender, RoutedEventArgs e)
         {
-
-
-            Microsoft.Win32.OpenFileDialog openFileDialog = new Microsoft.Win32.OpenFileDialog();
+            OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "All Files (*.*)|*.*";
             openFileDialog.AddExtension = true;
             openFileDialog.CheckFileExists = true;
             openFileDialog.CheckPathExists = true;
             openFileDialog.Multiselect = false;
             openFileDialog.Title = "Select a file";
-            Status.Text = "";
-      
 
             if (openFileDialog.ShowDialog() == true)
             {
-                path = openFileDialog.FileName;
+
+                string path = openFileDialog.FileName;
                 CalculateFileHash(path);
-                //get file properties too
-                FileInfo fi = new FileInfo(path);
-                Status.AppendText($"\nFile size: {fi.Length} bytes, attributes: {fi.Attributes}, {fi.CreationTime}");
+                Status.AppendText("\n" + getFileInfo(path));
             }
             else
             {
@@ -201,7 +236,12 @@ namespace ImageConverter
             }
         }
 
-        private ushort CalculateChecksum16(string filePath)
+        /// <summary>
+        /// Calculates and returns CRC 16 of any file 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        private string CalculateChecksum16(string filePath)
         {
             ushort checksum = 0;
 
@@ -214,20 +254,20 @@ namespace ImageConverter
 
                     while ((bytesRead = stream.Read(buffer, 0, buffer.Length)) > 0)
                     {
-                        for (int i = 0; i < bytesRead; i++)
+                        for (int i = 0; i < bytesRead; ++i)
                         {
                             checksum = (ushort)((checksum + buffer[i]) & 0xFFFF);
                         }
                     }
                 }
 
-                return checksum;
+                return checksum.ToString("X"); //convert decimal to hex
             }
-            catch (Exception ex)
+            catch (Exception ex) // Handle potential exceptions
             {
-                // Handle the exception as needed
+                Status.AppendText("\nError calculating checksum: " + ex.Message);
                 Console.WriteLine("Error calculating checksum: " + ex.Message);
-                throw; // Re-throw the exception if needed
+                throw; // Re-throw the exception as issue calculating checksum
             }
         }
 
@@ -235,21 +275,20 @@ namespace ImageConverter
         {
             try
             {
-                ushort checksum = CalculateChecksum16(filePath);
-                string checksumHex = checksum.ToString("X");
-
-                Status.AppendText("\nChecksum (CRC 16 Hex): " + checksumHex);
-                //convert to HEX
-
-
+                Status.AppendText($"\nChecksum (CRC 16 Hex): {CalculateChecksum16(filePath)}");
             }
             catch (Exception ex)
             {
                 Status.AppendText("\nError calculating checksum: " + ex.Message);
+                Console.WriteLine("Error calculating checksum: " + ex.Message);
             }
         }
 
-        private void CalculateFileHash(string filePath)
+        /// <summary>
+        /// Calculates SHA256 hash of any file
+        /// </summary>
+        /// <param name="filePath"></param>
+        private void CalculateFileHash(string filePath, string info = "")
         {
             try
             {
@@ -258,43 +297,49 @@ namespace ImageConverter
                     using (var sha = SHA256.Create()) // You can choose a different hash algorithm (e.g., SHA-1, SHA-256)
                     {
                         byte[] hashBytes = sha.ComputeHash(stream);
-                        hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                        string hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
 
+                        if (!string.IsNullOrEmpty(info))
+                        {
+                            Status.AppendText("\n" + info + ":");
+                        }
                         Status.AppendText("\nPath: " + filePath);
-                        Status.AppendText("\nSHA 256 Hash: " + hash);
-
-
+                        Status.AppendText("\nHash (SHA256): " + hash);
                     }
-
                     stream.Close();
                 }
-
             }
             catch (Exception ex)
             {
                 Status.AppendText("\nError calculating hash: " + ex.Message);
+                Console.WriteLine("Error calculating hash: " + ex.Message);
             }
 
             CalculateFileChecksum(filePath);
         }
 
-
-
-        private void CopyToClipboardHash_Click(object sender, RoutedEventArgs e)
+        private void LogButton_Click(object sender, RoutedEventArgs e)
         {
-            CopyClip(hash, "hash");
+            Status.Text = ""; //clear the box
         }
 
-        private void CopyToClipboardPath_Click(object sender, RoutedEventArgs e)
+        private void LogCopyButton_Click(object sender, RoutedEventArgs e)
         {
-            CopyClip(path,"path");
+            if (Status.Text.Contains("No log to copy."))
+            {
+                Status.Text = "";
+            }
+            else
+            {
+                CopyClip(Status.Text, "log");
+            }
         }
 
         private void CopyClip(string item, string type)
         {
             if (!string.IsNullOrEmpty(item as string))
             {
-                Clipboard.SetText(item);
+                Clipboard.SetText(item.Trim());
             }
             else
             {

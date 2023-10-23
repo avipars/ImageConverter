@@ -40,6 +40,4 @@ Get File Info:
 
 * Even works for files in the recycle bin
 
-
-
-
+* Can be used to compare files via checksum, hash, and size

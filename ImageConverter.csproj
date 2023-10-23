@@ -7,7 +7,7 @@
     <UseWPF>true</UseWPF>
     <UseWindowsForms>False</UseWindowsForms>
     <StartupObject>ImageConverter.App</StartupObject>
-    <ApplicationIcon>icon.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <Copyright>AmCan Tech 2023</Copyright>
     <PackageIcon>new_icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -32,7 +32,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="icon.ico" />
+    <None Remove="Assets\new_icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\icon.ico" />
+    <Content Include="Assets\new_icon.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -41,10 +49,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="new_icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
     <None Update="README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
