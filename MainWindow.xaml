@@ -31,16 +31,25 @@
 
 
         <Separator/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" x:Name="FilesStackPanel">
 
-        <Button Content="Get File Info" Click="HashButton_Click" x:Name="HashButton" Margin="5,5,5,5" MaxWidth="150" Width="100" MaxHeight="25" Height="25"/>
+            <Button Content="Get File Info" Click="HashButton_Click" x:Name="HashButton" Margin="5,5,5,5" MaxWidth="150" Width="100" MaxHeight="25" Height="25"/>
+            
+            <Button Content="Copy Hash" Click="copyHashButton_Click" x:Name="CopyHashButton" Margin="5,5,5,5" MaxWidth="100" Width="70" MaxHeight="25" Height="25" Visibility="Hidden"/>
+
+            <Button Content="Open in VirusTotal" Click="VirusButton_Click" x:Name="VirushButton" Margin="5,5,5,5" MaxWidth="150" Width="110" MaxHeight="25" Height="25" Visibility="Hidden"/>
+            
+        </StackPanel>
 
 
-        <TextBox Text="" x:Name="Status" IsReadOnly="True" ToolTip="Information about files" MinHeight="100"/>
+        <TextBox Text="" x:Name="Status" IsReadOnly="True" ToolTip="Information about files" MinHeight="100" />
 
-        <StackPanel Orientation="Horizontal">
-            <Button Content="Copy logs" Click="LogCopyButton_Click" x:Name="LogCopyButton" Margin="5,5,5,5" MaxWidth="100" Width="75" MaxHeight="25" Height="25"/>
+        <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" x:Name="LogsStackPanel" Visibility="Hidden">
+
+            <Button Content="Copy logs" Click="LogCopyButton_Click" x:Name="LogCopyButton" Margin="5,5,5,5" MaxWidth="100" Width="75" MaxHeight="25" Height="25" />
 
             <Button Content="Clear logs" Click="LogButton_Click" x:Name="LogButton" Margin="5,5,5,5" MaxWidth="100" Width="75" MaxHeight="25" Height="25"/>
+            
         </StackPanel>
     </StackPanel>
 

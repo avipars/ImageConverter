@@ -12,6 +12,8 @@ using System.Collections;
 using System.Runtime.Intrinsics.Arm;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
+using System.Diagnostics;
 
 namespace ImageConverter
 {
@@ -26,6 +28,9 @@ namespace ImageConverter
             Image IMPreview = new Image(); //new image
         }
 
+        string lastSavedHash = "";
+        bool hashExists = false;
+
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -36,6 +41,8 @@ namespace ImageConverter
             openFileDialog.Multiselect = false; //only 1 image at a time
             openFileDialog.CheckFileExists = true;
             openFileDialog.CheckPathExists = true;
+
+            LogsStackPanel.Visibility = Visibility.Visible;
 
             if (openFileDialog.ShowDialog() == true)
             {
@@ -60,6 +67,7 @@ namespace ImageConverter
                     }
                     else
                     {
+
                         format = selectedItem.Content.ToString().ToLower(); //get format from the spinner box (user shouln't be able to select anything else)
                     }
 
@@ -215,6 +223,8 @@ namespace ImageConverter
 
         private void HashButton_Click(object sender, RoutedEventArgs e)
         {
+            LogsStackPanel.Visibility = Visibility.Visible; //nothing to show
+
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "All Files (*.*)|*.*";
             openFileDialog.AddExtension = true;
@@ -234,8 +244,36 @@ namespace ImageConverter
             {
                 Status.Text = "No file selected";
             }
+
         }
 
+        private void copyHashButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (hashExists && lastSavedHash.Length > 0)
+            {
+                CopyClip(lastSavedHash, "hash");
+                LogsStackPanel.Visibility = Visibility.Visible; //nothing to show
+            }
+            else
+            {
+                Status.AppendText("\nNo hash to copy");
+            }
+        }   
+
+        private void VirusButton_Click(object sender,RoutedEventArgs e)
+        {
+            //take the sha256 hash and open in virustotal in browser
+            if(hashExists && lastSavedHash.Length > 0)
+            {
+                string url = "https://www.virustotal.com/gui/file/" + lastSavedHash + "/detection"; 
+                Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
+
+            }
+            else
+            {
+                Status.AppendText("\nNo hash to check");
+            }
+        }
         /// <summary>
         /// Calculates and returns CRC 16 of any file 
         /// </summary>
@@ -292,6 +330,8 @@ namespace ImageConverter
         {
             try
             {
+                LogsStackPanel.Visibility = Visibility.Visible;
+
                 using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
                     using (var sha = SHA256.Create()) // You can choose a different hash algorithm (e.g., SHA-1, SHA-256)
@@ -305,6 +345,10 @@ namespace ImageConverter
                         }
                         Status.AppendText("\nPath: " + filePath);
                         Status.AppendText("\nHash (SHA256): " + hash);
+                        lastSavedHash = hash;
+                        hashExists = true;
+                        CopyHashButton.Visibility = Visibility.Visible;
+                        VirushButton.Visibility = Visibility.Visible;
                     }
                     stream.Close();
                 }
@@ -313,6 +357,9 @@ namespace ImageConverter
             {
                 Status.AppendText("\nError calculating hash: " + ex.Message);
                 Console.WriteLine("Error calculating hash: " + ex.Message);
+                hashExists = false;
+                CopyHashButton.Visibility = Visibility.Hidden;
+                VirushButton.Visibility = Visibility.Hidden;
             }
 
             CalculateFileChecksum(filePath);
@@ -321,6 +368,7 @@ namespace ImageConverter
         private void LogButton_Click(object sender, RoutedEventArgs e)
         {
             Status.Text = ""; //clear the box
+            LogsStackPanel.Visibility = Visibility.Hidden; //nothing to show
         }
 
         private void LogCopyButton_Click(object sender, RoutedEventArgs e)
@@ -328,6 +376,7 @@ namespace ImageConverter
             if (Status.Text.Contains("No log to copy."))
             {
                 Status.Text = "";
+                LogsStackPanel.Visibility = Visibility.Hidden; //nothing to show
             }
             else
             {
