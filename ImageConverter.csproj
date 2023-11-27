@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net7.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>annotations</Nullable>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>False</UseWindowsForms>
     <StartupObject>ImageConverter.App</StartupObject>
@@ -17,6 +17,9 @@
     <Company>AmCan Tech</Company>
     <Authors>Avi Parshan</Authors>
     <SignAssembly>False</SignAssembly>
+    <Platforms>AnyCPU;x64</Platforms>
+    <PackageProjectUrl>https://github.com/avipars/ImageConverter</PackageProjectUrl>
+    <Description>Image Converter as well as hash checker</Description>
     <!--<PublishSingleFile>true</PublishSingleFile>-->
     <!--<PublishTrimmed>true</PublishTrimmed>-->
 
@@ -27,7 +30,16 @@
     <Optimize>False</Optimize>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+    <Optimize>False</Optimize>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
   </PropertyGroup>
 

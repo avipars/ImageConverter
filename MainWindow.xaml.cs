@@ -235,7 +235,6 @@ namespace ImageConverter
 
             if (openFileDialog.ShowDialog() == true)
             {
-
                 string path = openFileDialog.FileName;
                 CalculateFileHash(path);
                 Status.AppendText("\n" + getFileInfo(path));
@@ -258,16 +257,16 @@ namespace ImageConverter
             {
                 Status.AppendText("\nNo hash to copy");
             }
-        }   
+        }
 
-        private void VirusButton_Click(object sender,RoutedEventArgs e)
+        private void VirusButton_Click(object sender, RoutedEventArgs e)
         {
             //take the sha256 hash and open in virustotal in browser
-            if(hashExists && lastSavedHash.Length > 0)
+            if (hashExists && lastSavedHash.Length > 0)
             {
+                //string search = "https://www.virustotal.com/gui/search/" + lastSavedHash; //checks for new ones also
                 string url = "https://www.virustotal.com/gui/file/" + lastSavedHash + "/detection"; 
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
-
             }
             else
             {
@@ -358,8 +357,8 @@ namespace ImageConverter
                 Status.AppendText("\nError calculating hash: " + ex.Message);
                 Console.WriteLine("Error calculating hash: " + ex.Message);
                 hashExists = false;
-                CopyHashButton.Visibility = Visibility.Hidden;
-                VirushButton.Visibility = Visibility.Hidden;
+                CopyHashButton.Visibility = Visibility.Collapsed;
+                VirushButton.Visibility = Visibility.Collapsed;
             }
 
             CalculateFileChecksum(filePath);
@@ -368,7 +367,7 @@ namespace ImageConverter
         private void LogButton_Click(object sender, RoutedEventArgs e)
         {
             Status.Text = ""; //clear the box
-            LogsStackPanel.Visibility = Visibility.Hidden; //nothing to show
+            LogsStackPanel.Visibility = Visibility.Collapsed; //nothing to show
         }
 
         private void LogCopyButton_Click(object sender, RoutedEventArgs e)
@@ -376,7 +375,7 @@ namespace ImageConverter
             if (Status.Text.Contains("No log to copy."))
             {
                 Status.Text = "";
-                LogsStackPanel.Visibility = Visibility.Hidden; //nothing to show
+                LogsStackPanel.Visibility = Visibility.Collapsed; //nothing to show
             }
             else
             {
