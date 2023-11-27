@@ -4,18 +4,9 @@
              xmlns:local="clr-namespace:ImageConverter"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <Style TargetType="Border" x:Key="FancyBorder">
-            <Setter Property="Background" Value="#4E1A3D" />
-            <Setter Property="BorderThickness" Value="5" />
-            <Setter Property="BorderBrush">
-                <Setter.Value>
-                    <LinearGradientBrush>
-                        <GradientStop Offset="0.0" Color="#4E1A3D"/>
-                        <GradientStop Offset="1.0" Color="Salmon"/>
-                    </LinearGradientBrush>
-                </Setter.Value>
-            </Setter>
-        </Style>
+
+        <ResourceDictionary Source="Style.xaml"></ResourceDictionary>
+
     </Application.Resources>
-    
+
 </Application>

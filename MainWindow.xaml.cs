@@ -265,7 +265,7 @@ namespace ImageConverter
             if (hashExists && lastSavedHash.Length > 0)
             {
                 //string search = "https://www.virustotal.com/gui/search/" + lastSavedHash; //checks for new ones also
-                string url = "https://www.virustotal.com/gui/file/" + lastSavedHash + "/detection"; 
+                string url = "https://www.virustotal.com/gui/file/" + lastSavedHash + "/detection";
                 Process.Start(new ProcessStartInfo(url) { UseShellExecute = true });
             }
             else
