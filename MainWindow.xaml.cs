@@ -31,6 +31,7 @@ namespace ImageConverter
         string lastSavedHash = "";
         bool hashExists = false;
 
+  
         private void ConvertButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog();
@@ -44,15 +45,17 @@ namespace ImageConverter
 
             LogsStackPanel.Visibility = Visibility.Visible;
 
+
             if (openFileDialog.ShowDialog() == true)
             {
                 try
                 {
+                    bool isNegative = (NegativeButton.IsChecked == true);
+
                     // Load the selected image
                     BitmapImage bitmapImage = new BitmapImage(new Uri(openFileDialog.FileName));
                     bitmapImage.CacheOption = BitmapCacheOption.OnLoad; //load image into memory
                     bitmapImage.Freeze(); //prevent memory leaks
-
                     IMPreview.Source = bitmapImage; //show preview
 
 
@@ -170,8 +173,40 @@ namespace ImageConverter
                                 return;
                             }
 
+                            if (isNegative) //negate all colors/pixels (COPILOT)
+                            {
+                                try
+                                {
+                                    //get the pixels
+                                    int width = bitmapImage.PixelWidth;
+                                    int height = bitmapImage.PixelHeight;
+                                    int stride = width * ((bitmapImage.Format.BitsPerPixel + 7) / 8);
+                                    byte[] pixels = new byte[height * stride];
+                                    bitmapImage.CopyPixels(pixels, stride, 0);
+
+                                    //negate the pixels
+                                    for (int i = 0; i < pixels.Length; ++i)
+                                    {
+                                        pixels[i] = (byte)(255 - pixels[i]);
+                                    }
+
+                                    //create a new bitmap
+                                    BitmapSource negativeBitmap = BitmapSource.Create(width, height, bitmapImage.DpiX, bitmapImage.DpiY, bitmapImage.Format, bitmapImage.Palette, pixels, stride);
+                                    IMPreview.Source = negativeBitmap; //show preview
+
+                                    //set the encoder to the new bitmap
+                                    encoder.Frames.Add(BitmapFrame.Create(negativeBitmap));
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine("Error negating image: " + ex.Message);
+                                    Status.AppendText("\nError negating image: " + ex.Message);
+                                }
+                            }
+                         
 
                             encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+                            
                             encoder.Save(fileStream);
                             fileStream.Close(); //done with file
 
