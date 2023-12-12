@@ -56,8 +56,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="13.4.0" />
-    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+    <PackageReference Include="Magick.NET-Q8-AnyCPU" Version="13.5.0" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
   </ItemGroup>
 
   <ItemGroup>
