@@ -526,7 +526,7 @@ namespace ImageConverter
                             else
                             {
                                 Status.AppendText($"\nIssue with format {format} and {res}");
-                                throw new Exception($"Issue with format {format} and {res}"));
+                                throw new Exception($"Issue with format {format} and {res}");
                             }
                         }
                     }
