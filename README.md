@@ -1,8 +1,7 @@
 # ImageConverter
 
 
-![image](https://github.com/avipars/ImageConverter/assets/5733247/aa942aac-0236-401a-8e69-37eff07625e0)
-
+![image](https://github.com/avipars/ImageConverter/assets/5733247/b07c73c5-68c7-4192-89b6-2f3095ec3b31)
 
 Download/Run:
 
