@@ -14,8 +14,10 @@ Alternateively, you can compile it yourselv via Visual Studio 2022
   
 Application:
 
-* Uses WPF, .Net 7.0, Masgisk (for image conversions) Version 13.4.0 - at time of publishing
-
+* Uses WPF, .Net 7.0, Masgisk (for image conversions), Version 13.4.0 - at time of publishing
+  
+* NAudio.MediaFoundation (for audio conversions)
+  
 Convert:
 
 * Convert images to other formats (supports major formats in addition to webp and heif),
