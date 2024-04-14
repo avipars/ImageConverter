@@ -32,15 +32,17 @@
                         <Button Content="Open Folder" Click="OpenFolderButton_Click" Margin="5,5,5,5" MaxHeight="25" MaxWidth="100" Height="25" Width="75" Style="{StaticResource RoundedButton}" Visibility="Collapsed" x:Name="OpenImgButton"/>
                         <Button Content="Open Image" Click="OpenImgButton_Click" Margin="5,5,5,5" MaxHeight="25" MaxWidth="100" Height="25" Width="75" Style="{StaticResource RoundedButton}" Visibility="Collapsed" x:Name="OpenFolderButton" />
                     </StackPanel>
-
+                    <TextBlock x:Name="ImageInfo" Text=""/>
                 </StackPanel>
             </TabItem>
             <TabItem Header="Audio">
                 <!-- Put the button to the right of the combo box-->
                 <StackPanel Margin="15" Orientation="Vertical" Width="625">
-
                     <!-- Put the button to the right of the combo box-->
+                    <Label x:Name="WIP" Content="This is a work in progress"/>
+
                     <StackPanel Orientation="Horizontal">
+                        
                         <Label x:Name="ConvertAudioFormat" Content="Pick the new file type:" MaxWidth="175" Width="150" MaxHeight="25" Height="25"  Margin="5,5,5,5"/>
                         <ComboBox x:Name="FormatAudioComboBox" SelectedIndex="0" Width="100" MaxWidth="200" Height="25" MaxHeight="25" ToolTip="Conversion Format"  Margin="5,5,5,5">
                             <ComboBoxItem Content="MP3" x:Name="mp3"/>
@@ -57,6 +59,8 @@
                         <Button Content="Open Folder" Click="OpenFolderButton_Click" Margin="5,5,5,5" MaxHeight="25" MaxWidth="100" Height="25" Width="75" Style="{StaticResource RoundedButton}" Visibility="Collapsed" x:Name="OpenAudioButton"/>
                         <Button Content="Open Audio" Click="OpenImgButton_Click" Margin="5,5,5,5" MaxHeight="25" MaxWidth="100" Height="25" Width="75" Style="{StaticResource RoundedButton}" Visibility="Collapsed" x:Name="OpenAudioFolderButton" />
                     </StackPanel>
+                    <TextBlock x:Name="AudioInfo" Text=""/>
+
                 </StackPanel>
 
             </TabItem>
