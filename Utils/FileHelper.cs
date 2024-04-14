@@ -161,6 +161,7 @@ public class FileHelper
         switch (format.ToLower().Trim())   // Get the file extension based on the selected format
         {
             case "jpeg":
+            case "jpg":
                 imageFormat = ImageFormat.Jpeg;
                 break;
             case "png":
@@ -234,6 +235,7 @@ public class FileHelper
         switch (format.ToLower().Trim()) //get the right encoder based on the format
         {
             case "jpeg":
+            case "jpg":
                 encoder = new JpegBitmapEncoder();
                 break;
             case "png":
