@@ -428,7 +428,7 @@ public partial class MainWindow : Window
    
 
     /// <summary>
-    /// Calculates SHA256 hash of any file
+    /// Calculates SHA256, CR16 and some more hashes of any file
     /// </summary>
     /// <param name="filePath"></param>
     private void CalculateFileHash(string filePath, string info = "")
