@@ -157,7 +157,7 @@ public class FileHelper
 
     public static ImageFormat getImageFormat(string format)
     {
-        ImageFormat imageFormat = null
+        ImageFormat imageFormat = null;
         switch (format.ToLower().Trim())   // Get the file extension based on the selected format
         {
             case "jpeg":
@@ -218,48 +218,28 @@ public class FileHelper
 
     public static MagickFormat getSpecialFormat(string format)
     {
-        switch (format.ToLower().Trim())
+        return format.ToLower().Trim() switch
         {
-            case "heif":
-            case "heic":
-                return MagickFormat.Heif;
-            case "webp":
-                return MagickFormat.WebP;
-            case "ico":
-                return MagickFormat.Ico;
-            case "svg":
-                return MagickFormat.Svg;
-            default:
-                return MagickFormat.Png;
-        }
+            "heif" or "heic" => MagickFormat.Heif,
+            "webp" => MagickFormat.WebP,
+            "ico" => MagickFormat.Ico,
+            "svg" => MagickFormat.Svg,
+            _ => MagickFormat.Png,
+        };
     }
 
 
     public static BitmapEncoder mapStringToBitmapEncoder(string format = "")
     {
-        BitmapEncoder encoder; //the encoder to use 
-        switch (format.ToLower().Trim()) //get the right encoder based on the format
+        BitmapEncoder encoder = format.ToLower().Trim() switch //get the right encoder based on the format
         {
-            case "jpeg":
-            case "jpg":
-                encoder = new JpegBitmapEncoder();
-                break;
-            case "png":
-                encoder = new PngBitmapEncoder();
-                break;
-            case "gif":
-                encoder = new GifBitmapEncoder();
-                break;
-            case "tiff":
-                encoder = new TiffBitmapEncoder();
-                break;
-            case "bmp":
-                encoder = new BmpBitmapEncoder();
-                break;
-            default:
-                encoder = null;
-                break;
-        }
+            "jpeg" or "jpg" or "jfif" => new JpegBitmapEncoder(),
+            "png" => new PngBitmapEncoder(),
+            "gif" => new GifBitmapEncoder(),
+            "tiff" => new TiffBitmapEncoder(),
+            "bmp" => new BmpBitmapEncoder(),
+            _ => null,
+        };
         return encoder;
     }
 
@@ -316,21 +296,19 @@ public class FileHelper
     {
         try
         {
-            using (MagickImage image = new MagickImage())
+            using MagickImage image = new();
+            // Load the input image
+            MagickImage inputImage = new(inputImagePath);
+            // Set the icon file format
+            image.Format = FileHelper.getSpecialFormat(format);
+            if (width > 0 && height > 0)
             {
-                // Load the input image
-                MagickImage inputImage = new MagickImage(inputImagePath);
-                // Set the icon file format
-                image.Format = FileHelper.getSpecialFormat(format);
-                if (width > 0 && height > 0)
-                {
-                    inputImage.Resize(width, height); // Resize the image to the specified width and height
-                }
-
-                image.Write(outputIconPath);                     // Save the icon file
-                Console.WriteLine($"{format} file saved successfully.");
-                return (true, null);
+                inputImage.Resize(width, height); // Resize the image to the specified width and height
             }
+
+            image.Write(outputIconPath);                     // Save the icon file
+            Console.WriteLine($"{format} file saved successfully.");
+            return (true, null);
         }
         catch (Exception ex)
         {
@@ -338,6 +316,17 @@ public class FileHelper
             Console.WriteLine("Error saving icon file: " + ex.Message);
             return (false, ex);
         }
+    }
+    public static BitmapSource doGreyscale(BitmapImage bitmapImage)
+    {
+        // Convert to greyscale using FormatConvertedBitmap
+        FormatConvertedBitmap greyscaleBitmap = new();
+        greyscaleBitmap.BeginInit();
+        greyscaleBitmap.Source = bitmapImage;
         greyscaleBitmap.DestinationFormat = System.Windows.Media.PixelFormats.Gray8;
+        greyscaleBitmap.EndInit();
+        greyscaleBitmap.Freeze();
+        
+        return greyscaleBitmap;
     }
 }

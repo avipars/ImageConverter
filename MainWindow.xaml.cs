@@ -146,7 +146,7 @@ public partial class MainWindow : Window
     /// <param name="path"></param>
     /// <param name="newPath"></param>
     /// <param name="format"></param>
-    /// <returns></returns>
+    /// <returns>if it worked</returns>
     private bool baseConvert(string path, string newPath, string format)
     {
         using (var reader = new MediaFoundationReader(path)) //read the old file
@@ -220,6 +220,21 @@ public partial class MainWindow : Window
         }
     }
 
+    /// <summary>
+    /// Load BitmapImage with proper settings to avoid file locking
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    private BitmapImage LoadImageWithoutLock(string path)
+    {
+        BitmapImage bitmapImage = new BitmapImage();
+        bitmapImage.BeginInit();
+        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // Load image into memory immediately
+        bitmapImage.UriSource = new Uri(path);
+        bitmapImage.EndInit();
+        bitmapImage.Freeze(); // Make it thread-safe and release file handle
+        return bitmapImage;
+    }
 
     private void ConvertButton_Click(object sender, RoutedEventArgs e)
     {
@@ -244,11 +259,10 @@ public partial class MainWindow : Window
                     // get resolution of file
                     string resolution = string.Empty;
                     bool isNegative = (NegativeButton.IsChecked == true); //gets checkbox status
+                    bool isGreyscale = (GreyscaleButton.IsChecked == true); //gets checkbox status
 
-                    // Load the selected image
-                    BitmapImage bitmapImage = new BitmapImage(new Uri(path));
-                    bitmapImage.CacheOption = BitmapCacheOption.OnLoad; //load image into memory
-                    bitmapImage.Freeze(); //prevent memory leaks
+                    // Load the selected image without locking the file
+                    BitmapImage bitmapImage = LoadImageWithoutLock(path);
                     IMPreview.Source = bitmapImage; //show preview
 
                     ComboBoxItem selectedItem = (ComboBoxItem)FormatComboBox.SelectedItem; //get the selected target format
@@ -265,7 +279,7 @@ public partial class MainWindow : Window
                     }
                     else
                     {
-                        format = selectedItem.Content.ToString().ToLower(); //get format from the spinner box (user shouln't be able to select anything else)
+                        format = selectedItem.Content.ToString().ToLower(); //get format from the spinner box (user shouldn't be able to select anything else)
                     }
 
                     CalculateFileHash(path, "Original image");
@@ -306,11 +320,29 @@ public partial class MainWindow : Window
                                     return;
                                 }
 
-                                if (isNegative) //negate all colors/pixels (COPILOT)
+                                BitmapSource processedImage = bitmapImage;
+
+                                if (isGreyscale) //convert to greyscale
                                 {
                                     try
                                     {
-                                        IMPreview.Source = FileHelper.doNegative(bitmapImage, encoder);; //show preview
+                                        processedImage = FileHelper.doGreyscale(bitmapImage);
+                                        IMPreview.Source = processedImage; //show preview
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine("Error converting to greyscale: " + ex.Message);
+                                        Status.AppendText("\nError converting to greyscale: " + ex.Message);
+                                        res = false;
+                                    }
+                                }
+
+                                if (isNegative) //negate all colors/pixels
+                                {
+                                    try
+                                    {
+                                        processedImage = FileHelper.doNegative(processedImage, encoder);
+                                        IMPreview.Source = processedImage; //show preview
                                     }
                                     catch (Exception ex)
                                     {
@@ -319,7 +351,10 @@ public partial class MainWindow : Window
                                         res = false;
                                     }
                                 }
-                                encoder.Frames.Add(BitmapFrame.Create(bitmapImage));
+                                else
+                                {
+                                    encoder.Frames.Add(BitmapFrame.Create(processedImage));
+                                }
 
                                 encoder.Save(fileStream);
                                 fileStream.Close(); //done with file
@@ -331,7 +366,7 @@ public partial class MainWindow : Window
                             //done regular and special
                             Status.AppendText("\nImage converted and saved successfully!");
                             CalculateFileHash(saveFileDialog.FileName, "Converted image");
-                            Status.AppendText("\n" + FileHelper.getFileInfo(path));
+                            Status.AppendText("\n" + FileHelper.getFileInfo(saveFileDialog.FileName));
                             ToggleOpenButtons(false, true); //show ability to open it in folder or file
                         }
                         else

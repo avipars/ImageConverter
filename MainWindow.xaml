@@ -23,6 +23,7 @@
                             <!-- Add other format options here -->
                         </ComboBox>
                         <CheckBox Content="Negative"  x:Name="NegativeButton" Margin="5,5,5,5" MaxHeight="25" MaxWidth="100" Height="25" Width="70"/>
+                        <CheckBox Content="Greyscale"  x:Name="GreyscaleButton" Margin="5,5,5,5" MaxHeight="25" MaxWidth="100" Height="25" Width="75"/>
 
                         <Button Content="Convert" Click="ConvertButton_Click" Margin="5,5,5,5" MaxHeight="25" MaxWidth="100" Height="25" Width="60" Style="{StaticResource RoundedButton}"/>
                     </StackPanel>
@@ -86,4 +87,3 @@
         </TabControl>
     </DockPanel>
 </Window>
-    
