@@ -341,7 +341,7 @@ public partial class MainWindow : Window
                                 {
                                     try
                                     {
-                                        processedImage = FileHelper.doNegative(processedImage, encoder);
+                                        processedImage = FileHelper.doNegative(bitmapImage, encoder);
                                         IMPreview.Source = processedImage; //show preview
                                     }
                                     catch (Exception ex)
@@ -351,11 +351,8 @@ public partial class MainWindow : Window
                                         res = false;
                                     }
                                 }
-                                else
-                                {
-                                    encoder.Frames.Add(BitmapFrame.Create(processedImage));
-                                }
-
+                               
+                                encoder.Frames.Add(BitmapFrame.Create(processedImage));
                                 encoder.Save(fileStream);
                                 fileStream.Close(); //done with file
                                 res = true;
