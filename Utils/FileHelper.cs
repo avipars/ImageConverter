@@ -157,8 +157,7 @@ public class FileHelper
 
     public static ImageFormat getImageFormat(string format)
     {
-        ImageFormat imageFormat = null;
-
+        ImageFormat imageFormat = null
         switch (format.ToLower().Trim())   // Get the file extension based on the selected format
         {
             case "jpeg":
@@ -339,5 +338,6 @@ public class FileHelper
             Console.WriteLine("Error saving icon file: " + ex.Message);
             return (false, ex);
         }
+        greyscaleBitmap.DestinationFormat = System.Windows.Media.PixelFormats.Gray8;
     }
 }
