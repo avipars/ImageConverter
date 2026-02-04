@@ -1,14 +1,14 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using NAudio.MediaFoundation;
+using NAudio.Wave;
+using System;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using Microsoft.Win32;
-using System.Security.Cryptography;
-using System.Diagnostics;
-using NAudio.Wave;
-using NAudio.MediaFoundation;
 namespace ImageConverter;
 
 public partial class MainWindow : Window
@@ -220,21 +220,7 @@ public partial class MainWindow : Window
         }
     }
 
-    /// <summary>
-    /// Load BitmapImage with proper settings to avoid file locking
-    /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
-    private BitmapImage LoadImageWithoutLock(string path)
-    {
-        BitmapImage bitmapImage = new BitmapImage();
-        bitmapImage.BeginInit();
-        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // Load image into memory immediately
-        bitmapImage.UriSource = new Uri(path);
-        bitmapImage.EndInit();
-        bitmapImage.Freeze(); // Make it thread-safe and release file handle
-        return bitmapImage;
-    }
+
 
     private void ConvertButton_Click(object sender, RoutedEventArgs e)
     {
@@ -262,7 +248,7 @@ public partial class MainWindow : Window
                     bool isGreyscale = (GreyscaleButton.IsChecked == true); //gets checkbox status
 
                     // Load the selected image without locking the file
-                    BitmapImage bitmapImage = LoadImageWithoutLock(path);
+                    BitmapImage bitmapImage = FileHelper.LoadImageWithoutLock(path);
                     IMPreview.Source = bitmapImage; //show preview
 
                     ComboBoxItem selectedItem = (ComboBoxItem)FormatComboBox.SelectedItem; //get the selected target format
@@ -296,14 +282,14 @@ public partial class MainWindow : Window
                     {
                         fileName = saveFileDialog.FileName;
                         string newFormat = format.ToLower().Trim();
-                        if (newFormat.Equals("heif") || newFormat.Equals("heic") 
+                        if (newFormat.Equals("heif") || newFormat.Equals("heic")
                             || newFormat.Equals("webp") || newFormat.Equals("svg"))
                         {
                             res = saveSpecial(path, fileName, newFormat);
                         }
                         else if (newFormat.Equals("ico"))
                         {
-                            res =  saveSpecial(path, fileName, newFormat, 256, 256);
+                            res = saveSpecial(path, fileName, newFormat, 256, 256);
                         }
                         else
                         {
@@ -351,7 +337,7 @@ public partial class MainWindow : Window
                                         res = false;
                                     }
                                 }
-                               
+
                                 encoder.Frames.Add(BitmapFrame.Create(processedImage));
                                 encoder.Save(fileStream);
                                 fileStream.Close(); //done with file
@@ -382,8 +368,6 @@ public partial class MainWindow : Window
             }
         }
     }
-
-
 
     private void HashButton_Click(object sender, RoutedEventArgs e)
     {
@@ -457,7 +441,7 @@ public partial class MainWindow : Window
         }
     }
 
-   
+
 
     /// <summary>
     /// Calculates SHA256, CR16 and some more hashes of any file
@@ -474,7 +458,7 @@ public partial class MainWindow : Window
                 using (var sha = SHA256.Create()) // You can choose a different hash algorithm (e.g., SHA-1, SHA-256)
                 {
                     byte[] hashBytes = sha.ComputeHash(stream);
-                    string hash = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+                    string hash = Convert.ToHexStringLower(hashBytes);
 
                     if (!string.IsNullOrEmpty(info))
                     {

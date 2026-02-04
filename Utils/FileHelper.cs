@@ -1,12 +1,12 @@
-﻿using System;
+﻿using ImageMagick;
+using Microsoft.Win32;
+using NAudio.Wave;
+using System;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using Microsoft.Win32;
-using System.Diagnostics;
-using NAudio.Wave;
-using ImageMagick;
 
 namespace ImageConverter;
 
@@ -47,7 +47,7 @@ public class FileHelper
     /// </summary>
     /// <param name="filePath"></param>
     /// <returns></returns>
-    public static (string res,Exception? ex) CalculateChecksum16(string filePath)
+    public static (string res, Exception? ex) CalculateChecksum16(string filePath)
     {
         ushort checksum = 0;
 
@@ -67,7 +67,7 @@ public class FileHelper
                 }
             }
 
-            return (checksum.ToString("X"),null); //convert decimal to hex
+            return (checksum.ToString("X"), null); //convert decimal to hex
         }
         catch (Exception ex) // Handle potential exceptions
         {
@@ -111,7 +111,7 @@ public class FileHelper
         }
         else
         {
-            return false;  
+            return false;
         }
     }
 
@@ -292,7 +292,23 @@ public class FileHelper
         }
     }
 
-    public static (bool res,Exception? ex) saveSpecial(string format, string inputImagePath, string outputIconPath, uint width = 0, uint height = 0)
+    /// <summary>
+    /// Load BitmapImage with proper settings to avoid file locking
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    public static BitmapImage LoadImageWithoutLock(string path)
+    {
+        BitmapImage bitmapImage = new();
+        bitmapImage.BeginInit();
+        bitmapImage.CacheOption = BitmapCacheOption.OnLoad; // Load image into memory immediately
+        bitmapImage.UriSource = new Uri(path);
+        bitmapImage.EndInit();
+        bitmapImage.Freeze(); // Make it thread-safe and release file handle
+        return bitmapImage;
+    }
+
+    public static (bool res, Exception? ex) saveSpecial(string format, string inputImagePath, string outputIconPath, uint width = 0, uint height = 0)
     {
         try
         {
@@ -326,7 +342,7 @@ public class FileHelper
         greyscaleBitmap.DestinationFormat = System.Windows.Media.PixelFormats.Gray8;
         greyscaleBitmap.EndInit();
         greyscaleBitmap.Freeze();
-        
+
         return greyscaleBitmap;
     }
 }

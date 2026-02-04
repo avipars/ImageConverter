@@ -8,7 +8,7 @@
     <UseWindowsForms>False</UseWindowsForms>
     <StartupObject>ImageConverter.App</StartupObject>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
-    <Copyright>AmCan Tech 2023</Copyright>
+    <Copyright>AmCan Tech 2026</Copyright>
     <PackageIcon>new_icon.png</PackageIcon>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/avipars/ImageConverter</RepositoryUrl>
@@ -20,6 +20,9 @@
     <Platforms>AnyCPU;x64</Platforms>
     <PackageProjectUrl>https://github.com/avipars/ImageConverter</PackageProjectUrl>
     <Description>Image Converter as well as hash checker</Description>
+    <RepositoryType>git</RepositoryType>
+    <PackageReleaseNotes>Greyscale and some bug fixes</PackageReleaseNotes>
+    <Version>0.0.5</Version>
     <!--<PublishSingleFile>true</PublishSingleFile>-->
     <!--<PublishTrimmed>true</PublishTrimmed>-->
 
