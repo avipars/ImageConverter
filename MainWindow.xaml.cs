@@ -205,7 +205,7 @@ public partial class MainWindow : Window
     }
 
 
-    private bool saveSpecial(string format, string inputImagePath, string outputIconPath, int width = 0, int height = 0)
+    private bool saveSpecial(string format, string inputImagePath, string outputIconPath, uint width = 0, uint height = 0)
     {
         var result = FileHelper.saveSpecial(format, inputImagePath, outputIconPath, width, height);
         if (result.res && result.ex == null)
@@ -293,7 +293,7 @@ public partial class MainWindow : Window
                         }
                         else
                         {
-                            using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
+                            using (FileStream fileStream = new(fileName, FileMode.Create))
                             {
 
                                 BitmapEncoder encoder = FileHelper.mapStringToBitmapEncoder(format);

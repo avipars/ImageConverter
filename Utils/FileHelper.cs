@@ -30,12 +30,13 @@ public class FileHelper
     /// <returns></returns>
     public static string bytesToRightFormat(long bytes)
     {
+        int baseValue = 1024;
         string[] suffix = { "B", "KB", "MB", "GB", "TB" };
         int i;
         double dblSByte = bytes;
-        for (i = 0; i < suffix.Length && bytes >= 1024; ++i, bytes /= 1024)
+        for (i = 0; i < suffix.Length && bytes >= baseValue; ++i, bytes /= baseValue)
         {
-            dblSByte = bytes / 1024.0; //get the right format
+            dblSByte = bytes / baseValue; //get the right format
         }
 
         return String.Format("{0:0.##} {1}", dblSByte, suffix[i]);
@@ -163,6 +164,12 @@ public class FileHelper
             case "jpeg":
             case "jpg":
                 imageFormat = ImageFormat.Jpeg;
+                break;
+            case "":
+                imageFormat = ImageFormat.Png; //default to png
+                break;
+            case "jfif":
+                imageFormat = ImageFormat.Jpeg; //jfif is jpeg
                 break;
             case "png":
                 imageFormat = ImageFormat.Png;
@@ -306,7 +313,7 @@ public class FileHelper
         }
     }
 
-    public static (bool res,Exception? ex) saveSpecial(string format, string inputImagePath, string outputIconPath, int width = 0, int height = 0)
+    public static (bool res,Exception? ex) saveSpecial(string format, string inputImagePath, string outputIconPath, uint width = 0, uint height = 0)
     {
         try
         {
