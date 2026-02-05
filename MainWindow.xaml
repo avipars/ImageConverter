@@ -76,7 +76,7 @@
                         <Button Content="Open in VirusTotal" Click="VirusButton_Click" x:Name="VirushButton" Margin="5,5,5,5" MaxWidth="150" Width="110" MaxHeight="25" Height="25" Visibility="Collapsed" Style="{StaticResource RoundedButton}"/>
 
                     </StackPanel>
-                    <TextBox Text="" x:Name="Status" IsReadOnly="True" ToolTip="Information about files" MinHeight="100" Height="342" />
+                    <TextBox Text="" x:Name="Status" IsReadOnly="True" ToolTip="Information about files" MinHeight="100" Height="345" MinLines="3"   HorizontalScrollBarVisibility="Auto" />
 
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" x:Name="LogsStackPanel" Visibility="Collapsed">
                         <Button Content="Copy logs" Click="LogCopyButton_Click" x:Name="LogCopyButton" Margin="5,5,5,5" MaxWidth="100" Width="75" MaxHeight="25" Height="25" Style="{StaticResource RoundedButtonStyleBasic}"/>

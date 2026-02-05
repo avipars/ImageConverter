@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using ImageConverter.Utils;
+using Microsoft.Win32;
 using NAudio.MediaFoundation;
 using NAudio.Wave;
 using System;
