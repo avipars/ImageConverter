@@ -1,5 +1,6 @@
 # ImageConverter
 
+[![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/avipars)
 
 ![image](https://github.com/avipars/ImageConverter/assets/5733247/b07c73c5-68c7-4192-89b6-2f3095ec3b31)
 
