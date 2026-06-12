@@ -1,25 +1,20 @@
-# ImageConverter
+# ImageConverter++
 
 [![](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&color=%23fe8e86)](https://github.com/sponsors/avipars)
 
 ![image](https://github.com/avipars/ImageConverter/assets/5733247/b07c73c5-68c7-4192-89b6-2f3095ec3b31)
 
-Download/Run:
+## Download/Run:
 
 * Go to [Releases](https://github.com/avipars/ImageConverter/releases) and click on "ImageConverter.exe" in the latest release and run it
   
-* It's a portable exe... windows will prompt you with a warning before your un the app as it's not signed by them... if you want to run it, click more info -> run anyways.
+* It's a portable exe... Windows will prompt you with a warning before your run the app as it's not signed by them... if you want to run it, click more info -> run anyways.
 
-Alternateively, you can compile it yourselv via Visual Studio 2022
+  - Alternateively, you can compile it yourself via Visual Studio 2022
 
-  
-Application:
+## Features
 
-* Uses WPF, .Net 7.0, Masgisk (for image conversions), Version 13.4.0 - at time of publishing
-  
-* NAudio.MediaFoundation (for audio conversions)
-  
-Convert:
+## Convert Images:
 
 * Convert images to other formats (supports major formats in addition to webp and heif),
 
@@ -27,12 +22,12 @@ Convert:
 
 * Can save the negative of an image as well
 
-* Remove EXIF data - the new converted file will not contain any EXIF data
+* Removes EXIF data (automatically) - the new converted file will not contain any EXIF data
 
 * Allow user to rename the new file and chose where to save it via the dialogs
 
 
-Get File Info: 
+## Get File Info: 
 
 * Supports any file, not just images
 
@@ -48,4 +43,13 @@ Get File Info:
 
 * And has a button to check the hash in VirusTotal, if you click the button it will open the site with your SHA256 file hash in the browser
   
-* Upon clicking "open in VirusTotal": It will send ONLY the SHA256 hash to them (no files, or any other data)  
+  - Upon clicking "open in VirusTotal": It will send ONLY the SHA256 hash to them (no files, or any other data)
+
+
+## Dependencies:
+
+* Uses WPF, .Net 7.0, Masgisk (for image conversions)
+  
+* NAudio.MediaFoundation (for audio conversions)
+
+They are bundled in with the portable executable
